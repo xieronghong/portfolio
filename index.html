@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>谢荣鸿 · 板级硬件设计作品集</title>
+<style>
+  :root{
+    --ink:#111827; --ink-2:#4b5563; --ink-3:#9ca3af;
+    --bg:#f7f8fa; --card:#ffffff; --line:#e5e7eb;
+    --dark:#0f172a; --accent:#2563eb; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px; margin:0 auto; padding:0 20px}
+
+  /* ---------- 头部 ---------- */
+  .hero{background:var(--dark); color:#fff; padding:60px 0 52px}
+  .hero-grid{display:flex; gap:36px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .hero h1{margin:0 0 8px; font-size:34px; letter-spacing:.02em}
+  .hero .role{margin:0 0 18px; font-size:17px; color:#c7d2fe}
+  .hero .meta{margin:0; font-size:14px; color:#94a3b8; line-height:2}
+  .hero .meta b{color:#e2e8f0; font-weight:600}
+  .hero-line{margin:22px 0 0; padding-top:20px; border-top:1px solid rgba(255,255,255,.12);
+             font-size:13.5px; color:#94a3b8}
+  .avatar{width:150px; height:210px; border-radius:10px; object-fit:cover;
+          border:1px solid rgba(255,255,255,.25); flex:0 0 auto; display:block}
+  .avatar-ph{width:150px; height:210px; border-radius:10px; flex:0 0 auto;
+    border:1px dashed rgba(255,255,255,.35); display:flex; align-items:center;
+    justify-content:center; text-align:center; font-size:12px; color:#94a3b8; padding:10px}
+
+  section{padding:50px 0}
+  .sec-title{font-size:22px; margin:0 0 6px}
+  .sec-sub{color:var(--ink-2); font-size:14px; margin:0 0 26px}
+
+  /* ---------- 项目卡片 ---------- */
+  .project{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+           padding:28px; margin-bottom:24px}
+  .p-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap}
+  .p-head h3{margin:0; font-size:19px}
+  .p-date{color:var(--ink-3); font-size:13px; white-space:nowrap}
+  .p-role{color:var(--accent); font-size:13px; font-weight:600; margin:6px 0 14px}
+  .p-desc{margin:0 0 14px; color:var(--ink-2); font-size:14.5px}
+  .bullets{margin:0 0 16px; padding-left:18px; color:var(--ink-2); font-size:14.5px}
+  .bullets li{margin-bottom:5px}
+  .tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px}
+  .tag{background:#eef2ff; color:#3730a3; font-size:12.5px; padding:3px 10px; border-radius:999px}
+  .gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px}
+  .shot{position:relative; aspect-ratio:4/3; border-radius:10px; overflow:hidden;
+        background:#0f172a; border:1px solid var(--line)}
+  .shot img{width:100%; height:100%; object-fit:cover; display:block}
+  .shot .ph{position:absolute; inset:0; display:flex; flex-direction:column; gap:6px;
+    align-items:center; justify-content:center; text-align:center; padding:14px;
+    border:1px dashed #cbd5e1; border-radius:10px; background:#f8fafc;
+    color:var(--ink-3); font-size:12px}
+  .shot .ph code{font-size:11.5px; color:#64748b; background:#eef2f7; padding:2px 6px;
+                 border-radius:4px; word-break:break-all}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px}
+  .mini{background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .mini .shot{border:0; border-radius:0; aspect-ratio:16/10}
+  .mini .body{padding:12px 14px 14px}
+  .mini h4{margin:0 0 4px; font-size:14.5px}
+  .mini p{margin:0; font-size:12.5px; color:var(--ink-2)}
+
+  footer{background:var(--dark); color:#94a3b8; padding:40px 0; font-size:14px}
+  footer a{color:#c7d2fe; text-decoration:none; margin-right:18px}
+  footer a:hover{text-decoration:underline}
+
+  /* ---------- 编辑器 ---------- */
+  #editFab{position:fixed; right:20px; bottom:20px; z-index:50; border:0; cursor:pointer;
+    background:var(--accent); color:#fff; font-size:14px; padding:11px 18px; border-radius:999px;
+    box-shadow:0 6px 18px rgba(37,99,235,.35); font-family:inherit}
+  #bar{position:fixed; left:0; right:0; bottom:0; z-index:60; background:#0b1220; color:#e5e7eb;
+    padding:10px 16px; display:none; gap:10px; align-items:center; flex-wrap:wrap; font-size:13.5px}
+  #bar.on{display:flex}
+  #bar button{font-family:inherit; font-size:13.5px; cursor:pointer; border:1px solid #334155;
+    background:#1e293b; color:#e5e7eb; padding:7px 13px; border-radius:8px}
+  #bar button:hover{background:#273449}
+  #bar button.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  #bar .hint{color:#94a3b8; margin-left:auto}
+  body.editing{padding-bottom:70px}
+  body.editing .project,body.editing .mini{outline:2px dashed #bfdbfe; outline-offset:2px}
+
+  .form{display:grid; gap:10px}
+  .form label{font-size:12.5px; color:var(--ink-2); display:block; margin-bottom:3px}
+  .form input,.form textarea{width:100%; font-family:inherit; font-size:14px; padding:8px 10px;
+    border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink)}
+  .form textarea{resize:vertical; min-height:76px; line-height:1.6}
+  .form .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .imgs{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px}
+  .imgs .cell{position:relative; border:1px dashed #cbd5e1; border-radius:10px; overflow:hidden;
+    aspect-ratio:4/3; background:#f8fafc; cursor:pointer; display:flex; align-items:center;
+    justify-content:center; color:var(--ink-3); font-size:12px; text-align:center; padding:8px}
+  .imgs .cell img{width:100%; height:100%; object-fit:cover; display:block}
+  .imgs .cell .del{position:absolute; top:4px; right:4px; background:rgba(15,23,42,.78); color:#fff;
+    border:0; border-radius:6px; font-size:11px; padding:2px 7px; cursor:pointer}
+  .rowbtns{display:flex; gap:8px; margin-top:4px; flex-wrap:wrap}
+  .rowbtns button{font-family:inherit; font-size:13px; cursor:pointer; padding:7px 12px;
+    border-radius:8px; border:1px solid var(--line); background:#fff}
+  .rowbtns button.danger{color:#b91c1c; border-color:#fecaca}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid" id="hero"></div>
+    <p class="hero-line" id="hero-line"></p>
+  </div>
+</header>
+
+<section class="wrap" id="projects">
+  <h2 class="sec-title">项目作品</h2>
+  <p class="sec-sub">每个项目均可提供原理图、PCB 布局与实测数据，欢迎面试时展开讨论。</p>
+  <div id="project-list"></div>
+</section>
+
+<section class="wrap" id="more">
+  <h2 class="sec-title">其他项目</h2>
+  <p class="sec-sub">以下为部分其他作品的板级设计，均可提供源工程文件。</p>
+  <div class="grid" id="mini-list"></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p style="margin:0 0 12px;color:#e2e8f0;font-size:16px" id="foot-name"></p>
+    <div id="foot-links"></div>
+  </div>
+</footer>
+
+<button id="editFab" onclick="toggleEdit(true)">编辑内容</button>
+<div id="bar">
+  <button class="primary" onclick="exportHtml()">导出 HTML</button>
+  <button onclick="addProject()">添加项目</button>
+  <button onclick="addMini()">添加其他项目</button>
+  <button onclick="exportJson()">备份数据</button>
+  <button onclick="importJson()">导入数据</button>
+  <button onclick="resetAll()">恢复默认</button>
+  <button onclick="toggleEdit(false)">完成编辑</button>
+  <span class="hint" id="hint">改动自动保存在本机浏览器</span>
+</div>
+
+<script id="site-data" type="application/json">
+{
+  "showEditor": true,
+  "meta": {
+    "name": "谢荣鸿",
+    "role": "板级硬件设计 / PCB Layout 工程师",
+    "phone": "",
+    "email": "",
+    "city": "",
+    "availability": "",
+    "photo": "",
+    "heroLine": "独立完成 2–8 层板设计　·　已交付含 6 层控制板在内的多个硬件项目　·　8 个公开开源硬件作品",
+    "oshw": "https://oshwhub.com/xie-ronghong?tab=works"
+  },
+  "projects": [
+    {
+      "title": "无线皮层内脑机接口神经信号采集系统",
+      "date": "2025.10 - 2026.01",
+      "role": "硬件设计（香港城市大学研究项目委托）",
+      "desc": "面向无线皮层内脑机接口的神经信号采集硬件平台，用于多通道神经信号的采集与无线回传。",
+      "bullets": [
+        "独立完成控制板（6 层）与采集板（4 层）的硬件设计，另集成 ESP32 模块，采用排针叠层互连",
+        "采集端采用 RHD2132：32 通道、16 位 ADC、输入参考噪声 2.4 uVrms、最高 30 kSa/s 每通道",
+        "以 Xilinx Cmod A7（Artix-7 FPGA）为处理核心，经四线 SPI（25 MHz）与采集模块通信"
+      ],
+      "tags": ["6 层板", "4 层板", "FPGA", "RHD2132", "微弱信号", "叠层互联"],
+      "images": ["assets/neural/01.jpg", "assets/neural/02.jpg", "assets/neural/03.jpg"]
+    },
+    {
+      "title": "基于 STM32 的人造纤维电刺激测试装置",
+      "date": "2026.03 - 2026.04",
+      "role": "独立完成（中国科学院苏州纳米技术与纳米仿生研究所委托）",
+      "desc": "用于测试人造纤维在电流刺激下变化的实验装置，要求长时间稳定恒流输出并可编程控制时序。",
+      "bullets": [
+        "独立完成 4 层板硬件设计与整机调试",
+        "实现恒流输出控制，电流精度达 ±0.01 A，并采用软件 PID 算法闭环调节",
+        "支持通电时长与循环次数的精确设定与自动执行"
+      ],
+      "tags": ["4 层板", "STM32", "恒流源", "PID", "时序控制"],
+      "images": ["assets/fiber/01.jpg", "assets/fiber/02.jpg", "assets/fiber/03.jpg"]
+    },
+    {
+      "title": "BMD101 便携式心电采集仪",
+      "date": "2024.04 - 2024.07",
+      "role": "硬件与软件独立完成",
+      "desc": "基于 BMD101 生物电模拟前端的便携式单通道心电采集板，面向可穿戴场景。",
+      "bullets": [
+        "2 层板设计，实现单通道心电信号的采集与显示，硬件与软件全部独立完成",
+        "芯片内置 16 位 ADC，输出采样率 512 Hz，输入量程 ±8 mV",
+        "频响 0.5-100 Hz，50/60 Hz 工频陷波抑制达 -62 dB",
+        "项目已开源发布（立创星火计划 2024）"
+      ],
+      "tags": ["2 层板", "BMD101", "模拟前端", "微弱信号", "软硬件全栈"],
+      "images": ["assets/ecg/01.jpg", "assets/ecg/02.jpg", "assets/ecg/03.jpg"]
+    },
+    {
+      "title": "简易录音屏蔽系统",
+      "date": "2024.08",
+      "role": "硬件设计（2024 年全国大学生电子设计竞赛 G 题）",
+      "desc": "利用超声波载波产生的拍频干扰使录音设备失效，获广东省赛区一等奖。",
+      "bullets": [
+        "采用多块 2 层板模块化设计，独立承担全部硬件设计",
+        "实测有效屏蔽距离 3 m、有效角度 150 度",
+        "全国大学生电子设计竞赛广东省赛区一等奖"
+      ],
+      "tags": ["模块化设计", "超声波", "功放驱动", "省级一等奖"],
+      "images": ["assets/jammer/01.jpg", "assets/jammer/02.jpg", "assets/jammer/03.jpg"]
+    },
+    {
+      "title": "小智 AI 语音交互硬件",
+      "date": "2025.08 - 2025.09",
+      "role": "独立完成（第十届立创电子设计开源大赛）",
+      "desc": "基于 SF32LB52 模组的本地语音交互硬件，可离线识别指令并控制外设、播报传感器数据。",
+      "bullets": [
+        "电源采用电池 / USB 双源结构，含自恢复保险丝与 ESD 防护",
+        "集成 CH340N 下载电路与 LM4871MX 音频功放，构成完整产品级方案",
+        "项目已开源发布（立创开源硬件广场）"
+      ],
+      "tags": ["SF32LB52", "语音交互", "音频功放", "双源供电"],
+      "images": ["assets/xiaozhi/01.jpg", "assets/xiaozhi/02.jpg", "assets/xiaozhi/03.jpg"]
+    }
+  ],
+  "mini": [
+    { "t": "FOC 触感反馈智能旋钮", "d": "ESP32-S3 · 8 页原理图 · FOC 电机驱动", "img": "assets/mini/foc.jpg" },
+    { "t": "基于 VL812 的 USB3.0 Hub", "d": "高速差分走线 · 592 条走线 / 40 过孔", "img": "assets/mini/vl812.jpg" },
+    { "t": "USB2.0 拓展坞（Type-C）", "d": "多层板布局 · 接口电源防护", "img": "assets/mini/usb20.jpg" },
+    { "t": "温湿度检测仪", "d": "STM32G030K6T6 · 第九届立创电赛", "img": "assets/mini/wenshidu.jpg" },
+    { "t": "LM6009 可调升降压吸烟风扇", "d": "升降压电源 · 面向焊接场景", "img": "assets/mini/fan.jpg" },
+    { "t": "简易数字示波器", "d": "GD32E230C8T6 · TL072 前端 · 四版迭代", "img": "assets/mini/scope.jpg" },
+    { "t": "元器件可靠性测试（电子五所）", "d": "老化 / 温循 / 振动 / 程序测试", "img": "assets/mini/reliability.jpg" }
+  ]
+}
+</script>
+
+<script>
+const DATA_EL = document.getElementById('site-data');
+const KEY = 'portfolio-data-v1';
+const DEFAULT_DATA = JSON.parse(DATA_EL.textContent);
+let state = JSON.parse(localStorage.getItem(KEY) || 'null') || JSON.parse(JSON.stringify(DEFAULT_DATA));
+let editing = false;
+
+const esc = s => String(s === null || s === undefined ? '' : s)
+  .replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+function shot(src){
+  const s = esc(src);
+  return '<div class="shot">'
+    + '<img src="' + s + '" alt="" loading="lazy" '
+    + 'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+    + '<div class="ph" style="display:none">图片待放入<br><code>' + s + '</code></div>'
+    + '</div>';
+}
+
+/* ---------------- 浏览态 ---------------- */
+function render(){
+  const m = state.meta;
+  const rows = [];
+  if (m.phone || m.email) {
+    rows.push([
+      m.phone ? '<b>电话</b>　' + esc(m.phone) : '',
+      m.email ? '<b>邮箱</b>　' + esc(m.email) : ''
+    ].filter(Boolean).join('　　'));
+  }
+  if (m.city || m.availability) {
+    rows.push([
+      m.city ? '<b>意向城市</b>　' + esc(m.city) : '',
+      m.availability ? '<b>到岗</b>　' + esc(m.availability) : ''
+    ].filter(Boolean).join('　　'));
+  }
+  document.getElementById('hero').innerHTML =
+    '<div>'
+    + '<h1>' + esc(m.name) + '</h1>'
+    + '<p class="role">' + esc(m.role) + '</p>'
+    + (rows.length ? '<p class="meta">' + rows.join('<br>') + '</p>' : '')
+    + '</div>'
+    + (m.photo ? '<img class="avatar" src="' + esc(m.photo) + '" alt="">' : '');
+  document.getElementById('hero-line').textContent = m.heroLine || '';
+
+  document.getElementById('project-list').innerHTML = state.projects.map(function(p){
+    return '<article class="project">'
+      + '<div class="p-head"><h3>' + esc(p.title) + '</h3><span class="p-date">' + esc(p.date) + '</span></div>'
+      + '<div class="p-role">' + esc(p.role) + '</div>'
+      + '<p class="p-desc">' + esc(p.desc) + '</p>'
+      + '<ul class="bullets">' + (p.bullets || []).map(function(b){ return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>'
+      + '<div class="tags">' + (p.tags || []).map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('') + '</div>'
+      + '<div class="gallery">' + (p.images || []).map(shot).join('') + '</div>'
+      + '</article>';
+  }).join('');
+
+  document.getElementById('mini-list').innerHTML = state.mini.map(function(x){
+    return '<article class="mini">' + shot(x.img)
+      + '<div class="body"><h4>' + esc(x.t) + '</h4><p>' + esc(x.d) + '</p></div></article>';
+  }).join('');
+
+  document.getElementById('foot-name').textContent = m.name + ' · ' + m.role;
+  const links = [];
+  if (m.email) links.push('<a href="mailto:' + esc(m.email) + '">' + esc(m.email) + '</a>');
+  if (m.phone) links.push('<a href="tel:' + esc(m.phone) + '">' + esc(m.phone) + '</a>');
+  if (m.oshw) links.push('<a href="' + esc(m.oshw) + '" target="_blank" rel="noopener">开源硬件主页</a>');
+  document.getElementById('foot-links').innerHTML = links.join('');
+
+  document.getElementById('editFab').style.display = state.showEditor ? 'block' : 'none';
+}
+
+/* ---------------- 编辑态 ---------------- */
+function imgCells(list, pi){
+  let h = '<div class="imgs">';
+  list.forEach(function(src, i){
+    h += '<div class="cell" onclick="pickImage(' + pi + ',' + i + ')">'
+      + (src ? '<img src="' + esc(src) + '" alt="">' : '点击上传图片')
+      + (src ? '<button class="del" onclick="event.stopPropagation();delImage(' + pi + ',' + i + ')">删</button>' : '')
+      + '</div>';
+  });
+  h += '<div class="cell" onclick="pickImage(' + pi + ',-1)">+ 加一张图</div></div>';
+  return h;
+}
+
+function renderEdit(){
+  const m = state.meta;
+  document.getElementById('hero').innerHTML =
+    '<div class="form" style="flex:1;min-width:290px">'
+    + '<div class="row2">'
+    + '<div><label>姓名</label><input value="' + esc(m.name) + '" oninput="setMeta(\'name\',this.value)"></div>'
+    + '<div><label>定位</label><input value="' + esc(m.role) + '" oninput="setMeta(\'role\',this.value)"></div>'
+    + '</div>'
+    + '<div class="row2">'
+    + '<div><label>电话</label><input value="' + esc(m.phone) + '" oninput="setMeta(\'phone\',this.value)"></div>'
+    + '<div><label>邮箱</label><input value="' + esc(m.email) + '" oninput="setMeta(\'email\',this.value)"></div>'
+    + '</div>'
+    + '<div class="row2">'
+    + '<div><label>意向城市</label><input value="' + esc(m.city) + '" oninput="setMeta(\'city\',this.value)"></div>'
+    + '<div><label>到岗时间</label><input value="' + esc(m.availability) + '" oninput="setMeta(\'availability\',this.value)"></div>'
+    + '</div>'
+    + '<div><label>一句话概述</label><input value="' + esc(m.heroLine) + '" oninput="setMeta(\'heroLine\',this.value)"></div>'
+    + '<div><label>开源主页链接</label><input value="' + esc(m.oshw) + '" oninput="setMeta(\'oshw\',this.value)"></div>'
+    + '</div>'
+    + '<div class="imgs" style="width:170px">'
+    + '<div class="cell" onclick="pickPhoto()">'
+    + (m.photo ? '<img src="' + esc(m.photo) + '" alt="">' : '点击上传证件照')
+    + '</div></div>';
+  document.getElementById('hero-line').textContent = '';
+
+  document.getElementById('project-list').innerHTML = state.projects.map(function(p, i){
+    return '<article class="project"><div class="form">'
+      + '<div class="row2">'
+      + '<div><label>项目名称</label><input value="' + esc(p.title) + '" oninput="setP(' + i + ',\'title\',this.value)"></div>'
+      + '<div><label>时间</label><input value="' + esc(p.date) + '" oninput="setP(' + i + ',\'date\',this.value)"></div>'
+      + '</div>'
+      + '<div><label>身份 / 委托方</label><input value="' + esc(p.role) + '" oninput="setP(' + i + ',\'role\',this.value)"></div>'
+      + '<div><label>一句话描述</label><textarea oninput="setP(' + i + ',\'desc\',this.value)">' + esc(p.desc) + '</textarea></div>'
+      + '<div><label>技术要点（每行一条）</label><textarea oninput="setP(' + i + ',\'bullets\',this.value)">' + esc((p.bullets || []).join('\n')) + '</textarea></div>'
+      + '<div><label>技术标签（用逗号或顿号分隔）</label><input value="' + esc((p.tags || []).join('、')) + '" oninput="setP(' + i + ',\'tags\',this.value)"></div>'
+      + '<div><label>项目图片</label>' + imgCells(p.images || [], i) + '</div>'
+      + '<div class="rowbtns">'
+      + '<button onclick="moveProject(' + i + ',-1)">上移</button>'
+      + '<button onclick="moveProject(' + i + ',1)">下移</button>'
+      + '<button class="danger" onclick="delProject(' + i + ')">删除本项目</button>'
+      + '</div></div></article>';
+  }).join('');
+
+  document.getElementById('mini-list').innerHTML = state.mini.map(function(x, i){
+    return '<article class="mini"><div class="form" style="padding:10px">'
+      + '<div class="imgs"><div class="cell" onclick="pickMini(' + i + ')">'
+      + (x.img ? '<img src="' + esc(x.img) + '" alt="">' : '点击上传')
+      + '</div></div>'
+      + '<div><input value="' + esc(x.t) + '" oninput="setMini(' + i + ',\'t\',this.value)"></div>'
+      + '<div><input value="' + esc(x.d) + '" oninput="setMini(' + i + ',\'d\',this.value)"></div>'
+      + '<div class="rowbtns"><button class="danger" onclick="delMini(' + i + ')">删除</button></div>'
+      + '</div></article>';
+  }).join('');
+
+  document.getElementById('foot-name').textContent = m.name + ' · ' + m.role;
+  document.getElementById('editFab').style.display = 'none';
+}
+
+/* ---------------- 编辑操作 ---------------- */
+function setMeta(k, v){ state.meta[k] = v; save(); }
+function setP(i, k, v){
+  if (k === 'bullets') state.projects[i].bullets = v.split('\n').filter(function(s){ return s.trim(); });
+  else if (k === 'tags') state.projects[i].tags = v.split(/[、,，]/).map(function(s){ return s.trim(); }).filter(Boolean);
+  else state.projects[i][k] = v;
+  save();
+}
+function setMini(i, k, v){ state.mini[i][k] = v; save(); }
+function addProject(){
+  state.projects.push({ title:'新项目', date:'', role:'', desc:'', bullets:[], tags:[], images:[] });
+  save(); renderEdit();
+  window.scrollTo(0, document.body.scrollHeight);
+}
+function delProject(i){
+  if (!confirm('确定删除「' + state.projects[i].title + '」？')) return;
+  state.projects.splice(i, 1); save(); renderEdit();
+}
+function moveProject(i, d){
+  const j = i + d;
+  if (j < 0 || j >= state.projects.length) return;
+  const t = state.projects[i]; state.projects[i] = state.projects[j]; state.projects[j] = t;
+  save(); renderEdit();
+}
+function addMini(){ state.mini.push({ t:'新项目', d:'', img:'' }); save(); renderEdit(); }
+function delMini(i){ state.mini.splice(i, 1); save(); renderEdit(); }
+
+function readFile(cb){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = function(){
+    const f = inp.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = function(){ cb(r.result); };
+    r.readAsDataURL(f);
+  };
+  inp.click();
+}
+function pickPhoto(){ readFile(function(d){ state.meta.photo = d; save(); renderEdit(); }); }
+function pickImage(pi, idx){
+  readFile(function(d){
+    if (!state.projects[pi].images) state.projects[pi].images = [];
+    if (idx === -1) state.projects[pi].images.push(d);
+    else state.projects[pi].images[idx] = d;
+    save(); renderEdit();
+  });
+}
+function delImage(pi, idx){ state.projects[pi].images.splice(idx, 1); save(); renderEdit(); }
+function pickMini(i){ readFile(function(d){ state.mini[i].img = d; save(); renderEdit(); }); }
+
+function toggleEdit(on){
+  editing = !!on;
+  document.body.classList.toggle('editing', editing);
+  document.getElementById('bar').classList.toggle('on', editing);
+  if (editing) renderEdit(); else { save(); render(); }
+  window.scrollTo(0, 0);
+}
+
+function resetAll(){
+  if (!confirm('恢复到最初的内容？本机保存的修改会全部丢失。')) return;
+  localStorage.removeItem(KEY);
+  state = clone(DEFAULT_DATA);
+  renderEdit();
+}
+
+function exportJson(){
+  download(new Blob([JSON.stringify(state, null, 2)], { type:'application/json' }), '作品集数据.json');
+}
+function importJson(){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = function(){
+    const f = inp.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = function(){
+      try { state = JSON.parse(r.result); save(); renderEdit(); alert('导入成功'); }
+      catch (e) { alert('文件格式不对：' + e.message); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+function exportHtml(){
+  const c = document.documentElement.cloneNode(true);
+  ['project-list','mini-list','hero','hero-line','foot-name','foot-links'].forEach(function(id){
+    const el = c.querySelector('#' + id); if (el) el.innerHTML = '';
+  });
+  c.querySelectorAll('.form').forEach(function(el){ el.remove(); });
+  const bar = c.querySelector('#bar'); if (bar) bar.remove();
+  const fab = c.querySelector('#editFab'); if (fab) fab.remove();
+
+  const out = clone(state);
+  out.showEditor = false;
+  const d = c.querySelector('#site-data');
+  if (d) d.textContent = JSON.stringify(out);
+
+  download(new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type:'text/html;charset=utf-8' }), 'index.html');
+}
+
+function download(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+}
+
+render();
+if (location.hash === '#edit') toggleEdit(true);
+</script>
+</body>
+</html>
